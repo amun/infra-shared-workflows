@@ -16,11 +16,8 @@ inputs:
     required: false
     type: string
     default: "./Dockerfile"
-  image:
+  repo:
     required: true
-    type: string
-  tag_with_latest:
-    required: false
     type: string
   copy_npm_rc_command:
     required: false
@@ -28,8 +25,8 @@ inputs:
   npm_registry_password:
     required: false
   runtime_env:
-    required: true
-    type: string
+    required: false
+    type: string 
 
 runs:
   using: "composite"
@@ -61,7 +58,6 @@ runs:
       platforms: linux/amd64
 
   - name: Set up Docker Context
-    id: buildx-context
     shell: bash
     run: |
       docker context create builders
