@@ -3,8 +3,13 @@ description: 'Builds and pushes a container image to ECR'
 
 inputs:
   aws_account_id:
-    required: true
+    required: false
     type: string
+    default: "764933035250"
+  aws_role:
+    required: false
+    type: string
+    default: "amun-github-actions"
   region:
     required: true
     type: string
@@ -40,7 +45,7 @@ runs:
     uses: aws-actions/configure-aws-credentials@v1
     with:
       aws-region: ${{ inputs.region }}
-      role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/amun-github-actions
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.aws_role }}
 
   - name: Login to Amazon ECR
     id: ecr
