@@ -32,6 +32,8 @@ inputs:
   runtime_env:
     required: false
     type: string 
+  build-args:
+    required: false
 
 runs:
   using: "composite"
@@ -83,6 +85,7 @@ runs:
       build-args: |
         NPM_REGISTRY_PASSWORD=${{ inputs.npm_registry_password }}
         runtime_env=${{ inputs.runtime_env }}
+        ${{ inputs.build-args }}
       tags: |
         ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:${{ github.base_ref || github.ref_name }}-${{ steps.short-sha.outputs.sha7 }}-${{ github.run_number }}
         ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
