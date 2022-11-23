@@ -32,8 +32,9 @@ inputs:
     required: true
 
 jobs:
+  using: "composite"
+  
   base_branch_cov:
-    runs-on: 21co
     steps:
       - uses: actions/checkout@v3
         with:
@@ -62,7 +63,6 @@ jobs:
 
   checks:
     needs: base_branch_cov
-    runs-on: 21co
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
