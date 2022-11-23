@@ -31,68 +31,62 @@ inputs:
     description: "Command for creating .npmrc file."
     required: true
 
-jobs:
+runs:
   using: "composite"
-  
-  base_branch_cov:
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.base_ref }}
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ inputs.node_version }}
-      - name: Copy .npmrc
-        run: ${{ inputs.copy_npm_rc_command }}
-      - name: Install root dependencies
-        env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
-        run: npm ci
-      - name: Build
-        env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
-        run: ${{ inputs.build_command }}
-      - name: Run Jasmine tests
-        run: ${{ inputs.test_coverage_command }}
-      - name: Upload code coverage for ref branch
-        uses: actions/upload-artifact@v3
-        with:
-          name: ref-lcov.info
-          path: ${{ inputs.coverage_path }}
-
-  checks:
-    needs: base_branch_cov
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: v16.11.0
-      - name: Download code coverage report from base branch
-        uses: actions/download-artifact@v3
-        with:
-          name: ref-lcov.info
-          path: ./base/lcov.info
-      - name: Copy .npmrc
-        run: ${{ inputs.copy_npm_rc_command }}
-      - name: Install root dependencies
-        env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
-        run: npm ci
-      - name: Build
-        env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
-        run: ${{ inputs.build_command }}
-      - name: Run Jasmine tests
-        run: ${{ inputs.test_coverage_command }}
-      - name: Generate Code Coverage report
-        uses: barecheck/code-coverage-action@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ${{ inputs.coverage_path }}
-          base-lcov-file: "./base/lcov.info"
-          minimum-ratio: ${{ inputs.minimum_ratio }}
-          send-summary-comment: ${{ inputs.send-summary-comment }}
-          show-annotations: "warning"
-          app-name: ${{ inputs.app_name }}
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.base_ref }}
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node_version }}
+    - name: Copy .npmrc
+      run: ${{ inputs.copy_npm_rc_command }}
+    - name: Install root dependencies
+      env:
+        NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+      run: npm ci
+    - name: Build
+      env:
+        NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+      run: ${{ inputs.build_command }}
+    - name: Run Jasmine tests
+      run: ${{ inputs.test_coverage_command }}
+    - name: Upload code coverage for ref branch
+      uses: actions/upload-artifact@v3
+      with:
+        name: ref-lcov.info
+        path: ${{ inputs.coverage_path }}
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: v16.11.0
+    - name: Download code coverage report from base branch
+      uses: actions/download-artifact@v3
+      with:
+        name: ref-lcov.info
+        path: ./base/lcov.info
+    - name: Copy .npmrc
+      run: ${{ inputs.copy_npm_rc_command }}
+    - name: Install root dependencies
+      env:
+        NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+      run: npm ci
+    - name: Build
+      env:
+        NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+      run: ${{ inputs.build_command }}
+    - name: Run Jasmine tests
+      run: ${{ inputs.test_coverage_command }}
+    - name: Generate Code Coverage report
+      uses: barecheck/code-coverage-action@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: ${{ inputs.coverage_path }}
+        base-lcov-file: "./base/lcov.info"
+        minimum-ratio: ${{ inputs.minimum_ratio }}
+        send-summary-comment: ${{ inputs.send-summary-comment }}
+        show-annotations: "warning"
+        app-name: ${{ inputs.app_name }}
