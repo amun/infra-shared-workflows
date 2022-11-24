@@ -1,39 +1,42 @@
 name: Code Coverage
 description: "Generates test coverage and publishes it on PR"
 
-inputs:
-  app_name:
-    description: "Name of the application, it will be displayed in comment."
-    required: true
-  minimum_ratio:
-    description: "Percentage of uncovered lines that are allowed for new changes. If code coverage is decreasing it will fails github action."
-    required: false
-    default: 0
-  send-summary-comment:
-    description: "Option to send Github code coverage comment based on the changes that were made in PR."
-    required: false
-    default: true
-  node_version:
-    description: "Version of Node"
-    required: false
-    default: v16.11.0
-  coverage_path:
-    description: "Points to generated lcov file."
-    required: false
-    default: ./coverage/lcov.info
-  build_command:
-    description: "Command for building application."
-    required: true
-  test_coverage_command:
-    description: "Command for generating test coverage."
-    required: true
-  copy_npm_rc_command:
-    description: "Command for creating .npmrc file."
-    required: true
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        description: "Name of the application, it will be displayed in comment."
+        required: true
+      minimum_ratio:
+        description: "Percentage of uncovered lines that are allowed for new changes. If code coverage is decreasing it will fails github action."
+        required: false
+        default: 0
+      send-summary-comment:
+        description: "Option to send Github code coverage comment based on the changes that were made in PR."
+        required: false
+        default: true
+      node_version:
+        description: "Version of Node"
+        required: false
+        default: v16.11.0
+      coverage_path:
+        description: "Points to generated lcov file."
+        required: false
+        default: ./coverage/lcov.info
+      build_command:
+        description: "Command for building application."
+        required: true
+      test_coverage_command:
+        description: "Command for generating test coverage."
+        required: true
+      copy_npm_rc_command:
+        description: "Command for creating .npmrc file."
+        required: true
+    secrets:
+      registry_password:
+        required: true
 
 jobs:
-  using: "composite"
-  
   base_branch_cov:
     steps:
       - uses: actions/checkout@v3
@@ -78,11 +81,11 @@ jobs:
         run: ${{ inputs.copy_npm_rc_command }}
       - name: Install root dependencies
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
         run: npm ci
       - name: Build
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
         run: ${{ inputs.build_command }}
       - name: Run Jasmine tests
         run: ${{ inputs.test_coverage_command }}
