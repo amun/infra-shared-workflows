@@ -1,5 +1,4 @@
 name: Code Coverage
-description: "Generates test coverage and publishes it on PR"
 
 on:
   workflow_call:
@@ -7,7 +6,7 @@ on:
       app_name:
         description: "Name of the application, it will be displayed in comment."
         required: true
-        type: string;
+        type: string
       minimum_ratio:
         description: "Percentage of uncovered lines that are allowed for new changes. If code coverage is decreasing it will fails github action."
         required: false
