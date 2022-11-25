@@ -84,7 +84,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ref-lcov.info
-          path: ./base/lcov.info
+          path: ./base
       - name: Copy .npmrc
         run: ${{ inputs.copy_npm_rc_command }}
       - name: Install root dependencies
