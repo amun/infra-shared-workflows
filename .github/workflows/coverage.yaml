@@ -74,6 +74,8 @@ jobs:
           path: ${{ inputs.coverage_path }}
 
   checks:
+    runs-on: 21co
+
     needs: base_branch_cov
     steps:
       - uses: actions/checkout@v3
