@@ -7,31 +7,39 @@ on:
       app_name:
         description: "Name of the application, it will be displayed in comment."
         required: true
+        type: string;
       minimum_ratio:
         description: "Percentage of uncovered lines that are allowed for new changes. If code coverage is decreasing it will fails github action."
         required: false
+        type: number
         default: 0
       send-summary-comment:
         description: "Option to send Github code coverage comment based on the changes that were made in PR."
         required: false
+        type: boolean
         default: true
       node_version:
         description: "Version of Node"
         required: false
+        type: string
         default: v16.11.0
       coverage_path:
         description: "Points to generated lcov file."
         required: false
+        type: string
         default: ./coverage/lcov.info
       build_command:
         description: "Command for building application."
         required: true
+        type: string
       test_coverage_command:
         description: "Command for generating test coverage."
         required: true
+        type: string
       copy_npm_rc_command:
         description: "Command for creating .npmrc file."
         required: true
+        type: string
     secrets:
       registry_password:
         required: true
