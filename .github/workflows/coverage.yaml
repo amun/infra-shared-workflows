@@ -39,9 +39,6 @@ on:
         description: "Command for creating .npmrc file."
         required: true
         type: string
-    secrets:
-      registry_password:
-        required: true
 
 jobs:
   base_branch_cov:
@@ -59,11 +56,11 @@ jobs:
         run: ${{ inputs.copy_npm_rc_command }}
       - name: Install root dependencies
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
         run: npm ci
       - name: Build
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
         run: ${{ inputs.build_command }}
       - name: Run Jasmine tests
         run: ${{ inputs.test_coverage_command }}
@@ -92,11 +89,11 @@ jobs:
         run: ${{ inputs.copy_npm_rc_command }}
       - name: Install root dependencies
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
         run: npm ci
       - name: Build
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
         run: ${{ inputs.build_command }}
       - name: Run Jasmine tests
         run: ${{ inputs.test_coverage_command }}
