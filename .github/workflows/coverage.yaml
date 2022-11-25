@@ -1,5 +1,4 @@
 name: Code Coverage
-description: "Generates test coverage and publishes it on PR"
 
 on:
   workflow_call:
@@ -7,7 +6,7 @@ on:
       app_name:
         description: "Name of the application, it will be displayed in comment."
         required: true
-        type: string;
+        type: string
       minimum_ratio:
         description: "Percentage of uncovered lines that are allowed for new changes. If code coverage is decreasing it will fails github action."
         required: false
@@ -40,12 +39,11 @@ on:
         description: "Command for creating .npmrc file."
         required: true
         type: string
-    secrets:
-      registry_password:
-        required: true
 
 jobs:
   base_branch_cov:
+    runs-on: 21co
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -73,6 +71,8 @@ jobs:
           path: ${{ inputs.coverage_path }}
 
   checks:
+    runs-on: 21co
+
     needs: base_branch_cov
     steps:
       - uses: actions/checkout@v3
@@ -84,16 +84,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ref-lcov.info
-          path: ./base/lcov.info
+          path: ./base
       - name: Copy .npmrc
         run: ${{ inputs.copy_npm_rc_command }}
       - name: Install root dependencies
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
         run: npm ci
       - name: Build
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
         run: ${{ inputs.build_command }}
       - name: Run Jasmine tests
         run: ${{ inputs.test_coverage_command }}
