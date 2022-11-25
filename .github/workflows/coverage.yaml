@@ -59,11 +59,11 @@ jobs:
         run: ${{ inputs.copy_npm_rc_command }}
       - name: Install root dependencies
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
         run: npm ci
       - name: Build
         env:
-          NPM_REGISTRY_PASSWORD: ${{ secrets.NPM_REGISTRY_PASSWORD }}
+          NPM_REGISTRY_PASSWORD: ${{ secrets.registry_password }}
         run: ${{ inputs.build_command }}
       - name: Run Jasmine tests
         run: ${{ inputs.test_coverage_command }}
