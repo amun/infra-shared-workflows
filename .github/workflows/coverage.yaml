@@ -45,6 +45,8 @@ on:
 
 jobs:
   base_branch_cov:
+    runs-on: 21co
+
     steps:
       - uses: actions/checkout@v3
         with:
