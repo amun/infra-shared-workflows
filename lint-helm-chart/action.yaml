@@ -30,5 +30,6 @@ runs:
 
     - name: Run chart-testing (lint)
       shell: bash
-      run: ct lint --target-branch ${{ github.base_ref }} --charts ${{ inputs.charts }} --validate-maintainers=true --check-version-increment=true
+      run: ct lint --target-branch ${{ github.base_ref }} --charts ${{ inputs.charts }} --lint-conf .ct/lintconf.yaml
+
 
