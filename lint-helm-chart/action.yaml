@@ -30,6 +30,6 @@ runs:
 
     - name: Run chart-testing (lint)
       shell: bash
-      run: ct lint --target-branch ${{ github.base_ref }} --charts ${{ inputs.charts }} --lint-conf .ct/lintconf.yaml
+      run: ct lint --target-branch ${{ github.base_ref }} --chart-dirs ${{ inputs.charts_dirs }}
 
 
