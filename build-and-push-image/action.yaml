@@ -10,25 +10,28 @@ inputs:
     required: false
     type: string
     default: "amun-github-actions"
-  region:
-    required: true
-    type: string
   build_context:
     required: false
     type: string
     default: "."
+  copy_npm_rc_command:
+    required: false
+    type: string
   dockerfile_path:
     required: false
     type: string
     default: "./Dockerfile"
+  npm_registry_password:
+    required: false
+  region:
+    required: true
+    type: string
   repo:
     required: true
     type: string
-  copy_npm_rc_command:
+  ref_name:
     required: false
     type: string
-  npm_registry_password:
-    required: false
   runtime_env:
     required: false
     type: string 
@@ -84,7 +87,7 @@ runs:
         NPM_REGISTRY_PASSWORD=${{ inputs.npm_registry_password }}
         runtime_env=${{ inputs.runtime_env }}
       tags: |
-        ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:${{ github.base_ref || github.ref_name }}-${{ steps.short-sha.outputs.sha7 }}-${{ github.run_number }}
+        ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:${{ inputs.ref_name || github.ref_name }}-${{ steps.short-sha.outputs.sha7 }}-${{ github.run_number }}
         ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
       cache-from: type=registry,ref=${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
       cache-to: type=inline
