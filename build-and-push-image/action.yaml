@@ -2,94 +2,92 @@ name: 'Build and Push Container Image'
 description: 'Builds and pushes a container image to ECR'
 
 inputs:
-  # aws_account_id:
-  #   required: false
-  #   type: string
-  #   default: "764933035250"
-  # aws_role:
-  #   required: false
-  #   type: string
-  #   default: "amun-github-actions"
-  # build_context:
-  #   required: false
-  #   type: string
-  #   default: "."
-  # copy_npm_rc_command:
-  #   required: false
-  #   type: string
-  # dockerfile_path:
-  #   required: false
-  #   type: string
-  #   default: "./Dockerfile"
-  # npm_registry_password:
-  #   required: false
-  # region:
-  #   required: true
-  #   type: string
-  # repo:
-  #   required: true
-  #   type: string
+  aws_account_id:
+    required: false
+    type: string
+    default: "764933035250"
+  aws_role:
+    required: false
+    type: string
+    default: "amun-github-actions"
+  build_context:
+    required: false
+    type: string
+    default: "."
+  copy_npm_rc_command:
+    required: false
+    type: string
+  dockerfile_path:
+    required: false
+    type: string
+    default: "./Dockerfile"
+  npm_registry_password:
+    required: false
+  region:
+    required: true
+    type: string
+  repo:
+    required: true
+    type: string
   ref_name:
     required: false
     type: string
-  # runtime_env:
-  #   required: false
-  #   type: string 
+  runtime_env:
+    required: false
+    type: string 
 
 runs:
   using: "composite"
   steps:
-  - run: echo ${{ inputs.ref_name || github.ref_name }}
+  - name: Get short SHA
+    id: short-sha
     shell: bash
-  # - name: Get short SHA
-  #   id: short-sha
-  #   shell: bash
-  #   run: echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+    run: echo "sha7=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-  # - name: Configure AWS credentials
-  #   uses: aws-actions/configure-aws-credentials@v1
-  #   with:
-  #     aws-region: ${{ inputs.region }}
-  #     role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.aws_role }}
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-region: ${{ inputs.region }}
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.aws_role }}
 
-  # - name: Login to Amazon ECR
-  #   id: ecr
-  #   uses: aws-actions/amazon-ecr-login@v1
+  - name: Login to Amazon ECR
+    id: ecr
+    uses: aws-actions/amazon-ecr-login@v1
 
-  # - name: Copy npm rc command
-  #   if: ${{ inputs.copy_npm_rc_command }}
-  #   shell: bash
-  #   run: |
-  #     ${{ inputs.copy_npm_rc_command }}
+  - name: Copy npm rc command
+    if: ${{ inputs.copy_npm_rc_command }}
+    shell: bash
+    run: |
+      ${{ inputs.copy_npm_rc_command }}
 
-  # - name: Set up QEMU
-  #   uses: docker/setup-qemu-action@v2
-  #   with:
-  #     platforms: linux/amd64
+  - name: Set up QEMU
+    uses: docker/setup-qemu-action@v2
+    with:
+      platforms: linux/amd64
 
-  # - name: Set up Docker Context
-  #   shell: bash
-  #   run: |
-  #     docker context create builders
+  - name: Set up Docker Context
+    shell: bash
+    run: |
+      docker context create builders
 
-  # - name: Set up Docker Buildx
-  #   uses: docker/setup-buildx-action@v2
-  #   with:
-  #     version: latest
-  #     endpoint: builders
+  - name: Set up Docker Buildx
+    uses: docker/setup-buildx-action@v2
+    with:
+      version: latest
+      endpoint: builders
 
-  # - name: Build and push
-  #   uses: docker/build-push-action@v3
-  #   with:
-  #     context: ${{ inputs.build_context }}
-  #     file: ${{ inputs.dockerfile_path }}
-  #     platforms: linux/amd64
-  #     push: true
-  #     build-args: |
-  #       NPM_REGISTRY_PASSWORD=${{ inputs.npm_registry_password }}
-  #       runtime_env=${{ inputs.runtime_env }}
-  #     tags: |
-  #       ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:${{ inputs.ref_name || github.ref_name }}-${{ steps.short-sha.outputs.sha7 }}-${{ github.run_number }}
-  #       ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
-  #     cache-from: type=registry,ref=${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
-  #     cache-to: type=inline
+  - name: Build and push
+    uses: docker/build-push-action@v3
+    with:
+      context: ${{ inputs.build_context }}
+      file: ${{ inputs.dockerfile_path }}
+      platforms: linux/amd64
+      push: true
+      build-args: |
+        NPM_REGISTRY_PASSWORD=${{ inputs.npm_registry_password }}
+        runtime_env=${{ inputs.runtime_env }}
+      tags: |
+        ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:${{ inputs.ref_name || github.ref_name }}-${{ steps.short-sha.outputs.sha7 }}-${{ github.run_number }}
+        ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
+      cache-from: type=registry,ref=${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
+      cache-to: type=inline
