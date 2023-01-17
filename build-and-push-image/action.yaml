@@ -40,6 +40,7 @@ runs:
   using: "composite"
   steps:
   - run: echo ${{ inputs.ref_name || github.ref_name }}
+    shell: bash
   # - name: Get short SHA
   #   id: short-sha
   #   shell: bash
