@@ -70,7 +70,9 @@ runs:
         fi'
 
     - name: 'Get Tag'
+      if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' }}
       id: get-tag
+      shell: bash
       run: |
         echo "TAG=${{ github.ref_name }}" >> $GITHUB_ENV
 
