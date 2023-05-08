@@ -92,8 +92,12 @@ runs:
       if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' && inputs.package == 'npm' }}
       shell: bash
       run: |
-        dirs = [x.strip() for x in ${{ inputs.directories }}.split(',')]
-        for dir in dirs; do
+        dirs = ${{ inputs.directories }}
+        IFS=',' read -r -a list <<< "$dirs"
+        echo "dirs: $list"
+        # Creata a list of the directories to update
+        directories = $(echo $dirs | tr "," "\n")
+        for dir in $list; do
           echo "Updating package.json in $dir"
           cd $dir
           npm version ${{ env.TAG }} --no-git-tag-version
