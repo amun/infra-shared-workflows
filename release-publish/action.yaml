@@ -92,6 +92,7 @@ runs:
       if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' && inputs.package == 'npm' }}
       shell: bash
       run: |
+        echo= "ls: $(ls)"
         dirs='${{ inputs.directories }}'
         IFS=',' read -r -a list <<< "$dirs"
         for dir in "${list[@]}"; do
