@@ -26,7 +26,8 @@ inputs:
   directories:
     required: false
     type: string
-    default: ["."]
+    default: "."
+
   
 runs:
   using: "composite"
@@ -91,7 +92,8 @@ runs:
       if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' && inputs.package == 'npm' }}
       shell: bash
       run: |
-        for dir in directories; do
+        dirs = [x.strip() for x in directories.split(',')]
+        for dir in dirs; do
           cd $dir
           npm version ${{ env.TAG }} --no-git-tag-version
           echo VERSION=$(node -p "require($dir/package.json).version")" >> $GITHUB_ENV
