@@ -67,7 +67,7 @@ runs:
         if [ "$onProductionBranch" == false ]; then
           echo -e "\033[31m Release tag ${{ github.ref_name }} is not on production branch. Aborting release build!"
           exit 1
-        fi'
+        fi
 
     - name: 'Get Tag'
       if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' }}
