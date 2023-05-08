@@ -94,8 +94,8 @@ runs:
       run: |
         dirs='${{ inputs.directories }}'
         IFS=',' read -r -a list <<< "$dirs"
-        echo "dirs: $list"
         for dir in "${list[@]}"; do
+          echo "pwd: $(pwd)"
           echo "dir: $dir"
           cd $dir
           npm version ${{ github.ref_name }} --no-git-tag-version
