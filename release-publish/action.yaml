@@ -95,15 +95,7 @@ runs:
         dirs = '${{ inputs.directories }}'
         IFS=',' read -r -a list <<< "$dirs"
         echo "dirs: $list"
-        # Creata a list of the directories to update
-        directories = $(echo $dirs | tr "," "\n")
-        for dir in $list; do
-          echo "Updating package.json in $dir"
-          cd $dir
-          npm version ${{ env.TAG }} --no-git-tag-version
-          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-          cd ..
-        done
+
 
     - name: 'Update branch with new version'
       if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' && inputs.package == 'npm' }}
