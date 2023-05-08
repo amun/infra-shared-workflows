@@ -69,21 +69,21 @@ runs:
           exit 1
         fi'
 
-    - name: 'Update package version'
+    - name: 'Get Tag'
+      id: get-tag
+      run: |
+        echo "TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+
+    - name: 'Set up node'
       if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' && inputs.package == 'npm' }}
       uses: actions/setup-node@v3
-      # Update the version in package.json
+      with:
+        node-version: '16'
+
+    - name: 'Update package.json with the new tag'
+      if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' && inputs.package == 'npm' }}
+      shell: bash
       run: |
-        current_version=$(node -p "require('./package.json').version")
-        node -e "const fs = require('fs'); const packageJson = JSON.parse(fs.readFileSync('./package.json')); packageJson.version = '${{ github.ref_name }}'; fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2));"
-        updated_version=$(node -p "require('./package.json').version")
-        if [ "$current_version" == "$updated_version" ]; then
-          echo -e "\033[31m Failed to update package version to ${{ github.ref_name }}. Aborting release build!"
-          exit 1
-        fi
-        npm version ${{ github.ref_name }}
-        git config --global user.email "github@21.com"
-        git config --global user.name "GitHub"
-        git add package.json
-        git commit -m "Update package version to ${{ github.ref_name }}"
-        git push origin ${{ github.ref_name }}
+        npm version ${{ env.TAG }} --no-git-tag-version
+        echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      
