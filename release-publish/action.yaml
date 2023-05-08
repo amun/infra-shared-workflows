@@ -106,6 +106,6 @@ runs:
       run: |
         git config --global user.email "github-actions@21.co"
         git config --global user.name "GitHub Actions"
-        git add package.json
+        git add .
         git commit -m "Update package.json version to ${{ env.VERSION }}"
         git push origin ${{ inputs.branch }}
