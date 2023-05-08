@@ -114,4 +114,4 @@ runs:
         git config --global user.name "GitHub Actions"
         git add .
         git commit -m "Update package.json version to ${{ env.VERSION }}"
-        git push
+        git push origin HEAD:${{ inputs.branch }}
