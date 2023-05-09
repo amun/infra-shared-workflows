@@ -1,0 +1,65 @@
+name: 'Prepare release'
+description: 'Check for release tag and prepare release'
+
+# Set inputs
+inputs:
+  branch:
+    required: false
+    type: string
+    default: "production"
+
+  staging_branch:
+    required: false
+    type: string
+    default: "staging"
+  
+  development_branch:
+    required: false
+    type: string
+    default: "dev"
+  
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: 'Set ref name'
+      id: ref-name
+      shell: bash
+      run: |
+        SEMVER_REGEX="^(v?)(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
+        if [[ ${{ github.ref_name }} == ${{ inputs.branch }} ]]; then
+          echo "REF_NAME=production" >> $GITHUB_ENV
+        elif [[ ${{ github.ref_name }} =~ $SEMVER_REGEX ]]; then
+          echo "REF_NAME=production" >> $GITHUB_ENV
+        elif [[ ${{ github.ref_name }} == ${{ inputs.staging_branch }} ]]; then
+          echo "REF_NAME=staging" >> $GITHUB_ENV
+        elif [[ ${{ github.ref_name }} == ${{ inputs.development_branch }} ]]; then
+          echo "REF_NAME=dev" >> $GITHUB_ENV
+        else
+          echo "REF_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo -e "\033[31m Ref ${{ github.ref_name }} does not match production or semver pattern vx.x.x! Aborting build!"
+          exit 1
+        fi
+    
+    - name: 'Release - Checkout'
+      if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' }}
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: 'Release - Tag checks'
+      if: ${{ env.REF_NAME == 'production' && github.event_name == 'release' }}
+      shell:  bash
+      run: |
+        onProductionBranch=false
+        branches=$(git branch -r --contains tags/${{ github.ref_name }})
+        for branch in $branches; do
+          if [[ $branch == "origin/${{ inputs.branch }}" ]]; then
+            onProductionBranch=true
+          fi
+        done
+        if [ "$onProductionBranch" == false ]; then
+          echo -e "\033[31m Release tag ${{ github.ref_name }} is not on production branch. Aborting release build!"
+          exit 1
+        fi
