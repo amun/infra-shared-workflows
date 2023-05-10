@@ -34,8 +34,10 @@ inputs:
     type: string
   runtime_env:
     required: false
-    type: string 
-
+    type: string
+  pip_conf_file:
+    required: false
+  
 runs:
   using: "composite"
   steps:
@@ -76,6 +78,16 @@ runs:
       version: latest
       endpoint: builders
 
+  # Get the values from pip config file so you can use them to set the pip conf in the docker build
+  - name: Get pip conf values
+    if: ${{ inputs.pip_conf_file }}
+    id: pip-conf
+    shell: bash
+    run: |
+      echo "pip_conf_index_url=$(cat ${{ inputs.pip_conf_file }} | grep index-url | cut -d'=' -f2)" >> $GITHUB_OUTPUT
+
+  
+
   - name: Build and push
     uses: docker/build-push-action@v3
     with:
@@ -86,6 +98,7 @@ runs:
       build-args: |
         NPM_REGISTRY_PASSWORD=${{ inputs.npm_registry_password }}
         runtime_env=${{ inputs.runtime_env }}
+        PIP_CONF_INDEX_URL=${{ steps.pip-conf.outputs.pip_conf_index_url }}
       tags: |
         ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:${{ inputs.ref_name || github.ref_name }}-${{ steps.short-sha.outputs.sha7 }}-${{ github.run_number }}
         ${{ inputs.aws_account_id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.repo }}:latest
