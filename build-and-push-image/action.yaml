@@ -62,11 +62,6 @@ runs:
     run: |
       ${{ inputs.copy_npm_rc_command }}
 
-  # - name: Set up QEMU
-  #   uses: docker/setup-qemu-action@v2
-  #   with:
-  #     platforms: linux/amd64
-
   - name: Set up Docker Context
     shell: bash
     run: |
