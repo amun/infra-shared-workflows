@@ -62,10 +62,10 @@ runs:
     run: |
       ${{ inputs.copy_npm_rc_command }}
 
-  - name: Set up QEMU
-    uses: docker/setup-qemu-action@v2
-    with:
-      platforms: linux/amd64
+  # - name: Set up QEMU
+  #   uses: docker/setup-qemu-action@v2
+  #   with:
+  #     platforms: linux/amd64
 
   - name: Set up Docker Context
     shell: bash
@@ -85,8 +85,6 @@ runs:
     shell: bash
     run: |
       echo "pip_conf_index_url=$(cat ${{ inputs.pip_conf_file }} | grep index-url | cut -d'=' -f2)" >> $GITHUB_OUTPUT
-
-  
 
   - name: Build and push
     uses: docker/build-push-action@v3
