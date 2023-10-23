@@ -59,11 +59,6 @@ runs:
     run: |
       ${{ inputs.copy_npm_rc_command }}
 
-  - name: Set up QEMU
-    uses: docker/setup-qemu-action@v2
-    with:
-      platforms: linux/amd64
-
   - name: Set up Docker Context
     shell: bash
     run: |
@@ -72,6 +67,7 @@ runs:
   - name: Set up Docker Buildx
     uses: docker/setup-buildx-action@v2
     with:
+      driver: docker
       version: latest
       endpoint: builders
 
