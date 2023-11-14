@@ -25,7 +25,6 @@ inputs:
   namespace:
     required: false
     type: string
-    default: "amun"
   
 
 runs:
@@ -42,7 +41,7 @@ runs:
     id: codeartifact
     shell: bash
     run: |
-      aws codeartifact login --tool ${{ inputs.tool }} --repository ${{ inputs.repository }} --domain ${{ inputs.domain }} --domain-owner ${{ inputs.aws_account_id }} --region ${{ inputs.region }} --namespace ${{ inputs.namespace }}
+      aws codeartifact login --tool ${{ inputs.tool }} --repository ${{ inputs.repository }} --domain ${{ inputs.domain }} --domain-owner ${{ inputs.aws_account_id }} --region ${{ inputs.region }}
 
   - name: Add always-auth=true in the npmrc file
     if: ${{ inputs.tool == 'npm' }}
