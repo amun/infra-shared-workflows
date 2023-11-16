@@ -1,0 +1,50 @@
+name: 'CodeArtifact setup'
+description: 'Sets up CodeArtifact for use in other actions'
+
+inputs:
+  aws_account_id:
+    required: false
+    type: string
+    default: "764933035250"
+  aws_role:
+    required: false
+    type: string
+    default: "amun-github-actions"
+  region:
+    required: true
+    type: string
+  tool:
+    required: true
+    type: string
+  repository:
+    required: true
+    type: string
+  domain:
+    required: true
+    type: string
+  namespace:
+    required: false
+    type: string
+  
+
+runs:
+  using: "composite"
+  steps:
+
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-region: ${{ inputs.region }}
+      role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.aws_role }}
+
+  - name: Login to Codeartifact
+    id: codeartifact
+    shell: bash
+    run: |
+      aws codeartifact login --tool ${{ inputs.tool }} --repository ${{ inputs.repository }} --domain ${{ inputs.domain }} --domain-owner ${{ inputs.aws_account_id }} --region ${{ inputs.region }}
+
+  - name: Add always-auth=true in the npmrc file
+    if: ${{ inputs.tool == 'npm' }}
+    shell: bash
+    run: |
+      echo "always-auth=true" >> $HOME/.npmrc
