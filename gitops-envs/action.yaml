@@ -100,13 +100,15 @@ runs:
                 fi
             else
                 echo "kustomization.yaml does not exist"
+                echo "SERVICE_EXISTS=false" >> $GITHUB_ENV
             fi
 
     - 
         name: Commit changes and push
-        if : ${{ inputs.action_type != 'remove' && env.SERVICE_EXISTS != 'false' }}
+        # if : ${{ inputs.action_type != 'remove' && env.SERVICE_EXISTS != 'false' }}
         shell: bash
         run: |
+            echo "Does the service exist? ${{ env.SERVICE_EXISTS }}"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git config --global user.name "github-actions[bot]"
             git add .
