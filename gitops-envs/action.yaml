@@ -109,4 +109,8 @@ runs:
             elif [[ "${{ inputs.action_type }}" == "deploy" ]]; then
               git commit -m "Deploying service ${{ inputs.service }} to ${{ inputs.cluster }} with image tag ${{ inputs.image_tag }}"
             fi
-            git push https://x-access-token:${{ inputs.token }}@github.com/${{inputs.repo}}.git HEAD:${{ inputs.branch }}
+            if git diff-index --quiet HEAD --; then
+              echo "No commits"
+            else
+              git push https://x-access-token:${{ inputs.token }}@github.com/${{inputs.repo}}.git HEAD:${{ inputs.branch }}
+            fi
