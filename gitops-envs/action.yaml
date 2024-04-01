@@ -62,7 +62,7 @@ runs:
             echo "Service already exists in kustomization.yaml"
           else
             echo "Adding service to kustomization.yaml"
-            echo "  - ${{ inputs.service }}" >> kustomization.yaml
+            echo "- ${{ inputs.service }}" >> kustomization.yaml
           fi
         else
           echo "kustomization.yaml does not exist"
