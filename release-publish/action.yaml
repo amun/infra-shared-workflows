@@ -17,6 +17,11 @@ inputs:
     required: false
     type: string
     default: "dev"
+
+outputs:
+  ref_name:
+    description: 'Name of the ref'
+    value: ${{ env.REF_NAME }}
   
 runs:
   using: "composite"
