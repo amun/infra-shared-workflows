@@ -39,8 +39,6 @@ inputs:
   namespace:
     type: string
     required: false
-    default: ${{ inputs.service }}
-  
 
 runs:
   using: 'composite'
@@ -81,7 +79,7 @@ runs:
         echo "Replace tag preview-*"
         cd ./apps/${{ inputs.cluster }}/${{ inputs.region }}/${{ inputs.service }}
         sed -i '/tag: preview-.*/d' release-patch.yaml
-        echo "      tag: ${{ inputs.image_tag }} # {\"\$imagepolicy\": \"${{ inputs.namespace }}:${{ inputs.service }}:tag\"}" >> release-patch.yaml
+        echo "      tag: ${{ inputs.image_tag }} # {\"\$imagepolicy\": \"${{ inputs.namespace || inputs.service }}:${{ inputs.service }}:tag\"}" >> release-patch.yaml
 
     -
         name: Remove preview service from kustomization.yaml
