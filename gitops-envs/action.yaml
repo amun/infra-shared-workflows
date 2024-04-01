@@ -91,6 +91,7 @@ runs:
             if [ -f "kustomization.yaml" ]; then
                 if grep -q "${{ inputs.service }}" "kustomization.yaml"; then
                     cat kustomization.yaml
+                    echo "Removing service from kustomization.yaml"
                     sed -i '/- ${{ inputs.service }}/d' kustomization.yaml
                 else
                     echo "${{ inputs.service }} does not exist in kustomization.yaml"
@@ -102,7 +103,7 @@ runs:
 
     - 
         name: Commit changes and push
-        if : ${{ inputs.action_type != 'remove' && env.SERVICE_EXISTS != 'false' }}
+        if : ${{ inputs.action_type != 'remove' && env.SERVICE_EXISTS == 'false' }}
         shell: bash
         run: |
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
