@@ -32,6 +32,9 @@ inputs:
     type: string
     required: true
     enum: ['deploy', 'remove']
+  image_tag:
+    type: string
+    required: false
   
 
 runs:
@@ -73,7 +76,7 @@ runs:
         echo "Replace tag preview-*"
         cd ./apps/${{ inputs.cluster }}/${{ inputs.region }}/#{{ inputs.service }}
         sed -i '/tag: preview-.*/d' release-patch.yaml
-        echo "      tag: preview-293214-dsd # {\"\$imagepolicy\": \"${{ inputs.service }}:${{ inputs.service }}:tag\"}" >> release-patch.yaml
+        echo "      tag: ${{ inputs.image_tag }} # {\"\$imagepolicy\": \"${{ inputs.service }}:${{ inputs.service }}:tag\"}" >> release-patch.yaml
 
     -
         name: Remove preview service from kustomization.yaml
