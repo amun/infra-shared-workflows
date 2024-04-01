@@ -41,7 +41,7 @@ inputs:
 outputs:
   sha7:
     description: 'Short SHA of the commit'
-    value: ${{ steps.short-sha.outputs.sha7 }}-{{ github.run_number }}
+    value: ${{ steps.short-sha.outputs.sha7 }}-${{ github.run_number }}
   
 runs:
   using: "composite"
