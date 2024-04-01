@@ -35,6 +35,7 @@ inputs:
   image_tag:
     type: string
     required: false
+    default: 'N/A'
   
 
 runs:
@@ -103,5 +104,9 @@ runs:
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git config --global user.name "github-actions[bot]"
             git add .
-            git commit -m "Update kustomization.yaml: ${{ inputs.action_type }} ${{ inputs.service }}"
+            if [[ "${{ inputs.action_type }}" == "remove" ]]; then
+              git commit -m "Update kustomization.yaml: Removing service ${{ inputs.service }} from ${{ inputs.cluster }}" 
+            elif [[ "${{ inputs.action_type }}" == "deploy" ]]; then
+              git commit -m "Removing service ${{ inputs.service }} from ${{ inputs.cluster }}"
+            fi
             git push https://x-access-token:${{ inputs.token }}@github.com/${{inputs.repo}}.git HEAD:${{ inputs.branch }}
