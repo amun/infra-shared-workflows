@@ -70,7 +70,7 @@ runs:
 
     -
       name: Replace tag preview-*
-      if: ${{ inputs.action_type == 'deploy' }}
+      if: ${{ inputs.action_type == 'deploy' && inputs.image_tag != 'N/A' }}
       id: replace-tag
       shell: bash
       run: |
