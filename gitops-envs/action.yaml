@@ -1,0 +1,112 @@
+name: 'Preview environment'
+description: Action that deploys or removes a preview environment.
+
+inputs:
+  environment:
+    type: string
+    required: false
+    default: 'preview'
+  repo:
+    type: string
+    required: false
+    default: 'amun/infra-gitops'
+  service:
+    type: string
+    required: true
+  token:
+    type: string
+    required: true
+  branch:
+    type: string
+    required: false
+    default: 'feat/eph-envs'
+  cluster:
+    type: string
+    required: false
+    default: 'staging'
+  region:
+    type: string
+    required: false
+    default: 'us-east-1'
+  action_type:
+    type: string
+    required: true
+    enum: ['deploy', 'remove']
+  image_tag:
+    type: string
+    required: false
+    default: 'N/A'
+  
+
+runs:
+  using: 'composite'
+  steps:
+
+    -
+      name: Checkout to the repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repo }}
+        ref: ${{ inputs.branch }}
+        token: ${{ inputs.token }}
+
+    -
+      name: Add preview service to kustomization.yaml
+      if: ${{ inputs.action_type == 'deploy' }}
+      id: add-service
+      shell: bash
+      run: |
+        cd ./apps/${{ inputs.cluster }}/${{ inputs.region }}
+        if [ -f "kustomization.yaml" ]; then
+          if grep -q "${{ inputs.service }}" kustomization.yaml; then
+            echo "Service already exists in kustomization.yaml"
+          else
+            echo "Adding service to kustomization.yaml"
+            echo "- ${{ inputs.service }}" >> kustomization.yaml
+          fi
+        else
+          echo "kustomization.yaml does not exist"
+        fi
+
+    -
+      name: Replace tag preview-*
+      if: ${{ inputs.action_type == 'deploy' && inputs.image_tag != 'N/A' }}
+      id: replace-tag
+      shell: bash
+      run: |
+        echo "Replace tag preview-*"
+        cd ./apps/${{ inputs.cluster }}/${{ inputs.region }}/${{ inputs.service }}
+        sed -i '/tag: preview-.*/d' release-patch.yaml
+        echo "      tag: ${{ inputs.image_tag }} # {\"\$imagepolicy\": \"${{ inputs.service }}:${{ inputs.service }}:tag\"}" >> release-patch.yaml
+
+    -
+        name: Remove preview service from kustomization.yaml
+        if: ${{ inputs.action_type == 'remove' }}
+        id: remove-service
+        shell: bash
+        run: |
+            cd ./apps/${{ inputs.cluster }}/${{ inputs.region }}
+            if [ -f "kustomization.yaml" ]; then
+                if grep -q "${{ inputs.service }}" "kustomization.yaml"; then
+                    cat kustomization.yaml
+                    sed -i '/- ${{ inputs.service }}/d' kustomization.yaml
+                else
+                    echo "${{ inputs.service }} does not exist in kustomization.yaml"
+                fi
+            else
+                echo "kustomization.yaml does not exist"
+            fi
+
+    - 
+        name: Commit changes and push
+        shell: bash
+        run: |
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "github-actions[bot]"
+            git add .
+            if [[ "${{ inputs.action_type }}" == "remove" ]]; then
+              git commit -m "Update kustomization.yaml: Removing service ${{ inputs.service }} from ${{ inputs.cluster }}" 
+            elif [[ "${{ inputs.action_type }}" == "deploy" ]]; then
+              git commit -m "Deploying service ${{ inputs.service }} to ${{ inputs.cluster }} with image tag ${{ inputs.image_tag }}"
+            fi
+            git push https://x-access-token:${{ inputs.token }}@github.com/${{inputs.repo}}.git HEAD:${{ inputs.branch }}
