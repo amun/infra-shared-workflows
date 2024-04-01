@@ -93,22 +93,20 @@ runs:
                     cat kustomization.yaml
                     echo "Removing service from kustomization.yaml"
                     sed -i '/- ${{ inputs.service }}/d' kustomization.yaml
-                    echo "SERVICE_EXISTS=true" >> $GITHUB_ENV
                 else
                     echo "${{ inputs.service }} does not exist in kustomization.yaml"
-                    echo "SERVICE_EXISTS=false" >> $GITHUB_ENV
+                    echo "SERVICE_DOES_NOT_EXIST=true" >> $GITHUB_ENV
                 fi
             else
                 echo "kustomization.yaml does not exist"
-                echo "SERVICE_EXISTS=false" >> $GITHUB_ENV
             fi
 
     - 
         name: Commit changes and push
-        # if : ${{ inputs.action_type != 'remove' && env.SERVICE_EXISTS != 'false' }}
+        if: ${{ env.SERVICE_DOES_NOT_EXIST != 'true' }}
         shell: bash
         run: |
-            echo "Does the service exist? ${{ env.SERVICE_EXISTS }}"
+            echo "Does the service exist? ${{ env.SERVICE_DOES_NOT_EXIST }}"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git config --global user.name "github-actions[bot]"
             git add .
