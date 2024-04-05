@@ -46,7 +46,6 @@ runs:
           echo "REF_NAME=staging" >> $GITHUB_ENV
         elif [[ ${{ github.ref_name }} == ${{ inputs.development_branch }} ]]; then
           echo "REF_NAME=dev" >> $GITHUB_ENV
-        # preview
         elif [[ ${{ github.ref_name }} == ${{ inputs.preview_branch }} ]]; then
           echo "REF_NAME=preview" >> $GITHUB_ENV
         else
